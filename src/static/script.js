@@ -1,5 +1,7 @@
 let textTextarea = document.getElementById("textTextarea");
 let sendButton = document.getElementById("sendButton");
+let saveTextArea = document.getElementById("saveTextArea");
+saveTextArea.value = "mySound.wav";
 
 sendButton.addEventListener("click", () => {
     let url = window.location.href;
@@ -17,7 +19,7 @@ sendButton.addEventListener("click", () => {
         }
     ).then(res => {
         if (!res.ok) {
-            throw new Error("");
+            throw new Error(`Error while sending request to remote server (Status ${res.status}`);
         } 
 
         return res.blob();
@@ -26,7 +28,7 @@ sendButton.addEventListener("click", () => {
         const a = document.createElement("a");
 
         a.href = url;
-        a.download = "OpenTTS.wav";
+        a.download = saveTextArea.value;
 
         a.click();
         a.remove();
