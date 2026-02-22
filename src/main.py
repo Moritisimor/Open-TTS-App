@@ -5,14 +5,19 @@ import uvicorn
 import pyttsx3
 import io
 import tempfile
+from requestbody import RequestBody
 
 app = fastapi.FastAPI()
 
-@app.get("/api/speak/{text}")
-async def speak(text: str):
+@app.post("/api/speak")
+async def speak(body: RequestBody):
     with tempfile.NamedTemporaryFile(mode="w+b", delete=True, suffix=".wav") as f:
         engine = pyttsx3.init()
-        engine.save_to_file(text, f.name)
+        engine.setProperty("rate", body.rate)
+        engine.setProperty("volume", body.volume)
+        engine.setProperty("voice", body.voice)
+
+        engine.save_to_file(body.text, f.name)
         engine.runAndWait()
 
         f.flush()

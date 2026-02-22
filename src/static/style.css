@@ -1,11 +1,21 @@
 html {
     background-color: rgb(50, 50, 50);
-    color: lightgray;
+    color: rgb(255, 255, 255);
     text-align: center;
 }
 
-button {
-    background-color: black;
-    color: white;
-    border-radius: 35px;
+textarea, button {
+    background-color: white;
+    color: black;
+    border-radius: 20px
 }
+
+.top, .main {
+    margin-top: 2%;
+    border: solid black;
+    border-radius: 35px;
+    padding: 2%;
+    display: inline-block;
+    background-color: rgb(25, 25, 25);
+}
+
