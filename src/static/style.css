@@ -1,0 +1,11 @@
+html {
+    background-color: rgb(50, 50, 50);
+    color: lightgray;
+    text-align: center;
+}
+
+button {
+    background-color: black;
+    color: white;
+    border-radius: 35px;
+}
