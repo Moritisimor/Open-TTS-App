@@ -20,7 +20,7 @@ sendButton.addEventListener("click", () => {
         if (!res.ok) {
             if (res.status === 422) {
                 throw new Error(`Server got an unprocessable entity (make sure a valid model is selected)`);
-            } else if (res.status == 400) {
+            } else if (res.status === 400) {
                 throw new Error(`Server got a bad request (make sure text is non-empty and contains valid characters)`);
             } else {
                 throw new Error(`Error while sending request to remote server (Status ${res.status}`);
