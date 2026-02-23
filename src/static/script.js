@@ -1,5 +1,6 @@
 let textTextarea = document.getElementById("textTextarea");
 let sendButton = document.getElementById("sendButton");
+let modelTextArea = document.getElementById("modelTextArea");
 let saveTextArea = document.getElementById("saveTextArea");
 saveTextArea.value = "mySound.wav";
 
@@ -11,15 +12,19 @@ sendButton.addEventListener("click", () => {
             "headers": new Headers({"content-type": "application/json"}),
             "method": "POST",
             "body": JSON.stringify({
-                "voice": 0,
-                "rate": 200,
-                "volume": 1.0,
+                "model": modelTextArea.value,
                 "text": textTextarea.value
             })
         }
     ).then(res => {
         if (!res.ok) {
-            throw new Error(`Error while sending request to remote server (Status ${res.status}`);
+            if (res.status === 422) {
+                throw new Error(`Server got an unprocessable entity (make sure a valid model is selected)`);
+            } else if (res.status == 400) {
+                throw new Error(`Server got a bad request (make sure text is non-empty and contains valid characters)`);
+            } else {
+                throw new Error(`Error while sending request to remote server (Status ${res.status}`);
+            }
         } 
 
         return res.blob();
