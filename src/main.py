@@ -63,4 +63,4 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         uvicorn.run(app, host="0.0.0.0", port=8000)
     else:
-        print("This application requires a path to the Piper Model.")
+        print("This application requires a path to the Piper Model Folder.")
