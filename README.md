@@ -27,7 +27,7 @@ You will then need to set up a virtual environment:
 python -m venv .venv
 ```
 
-And finally update your environment variables:
+Then, update your environment variables:
 #### Linux/macOS/BSD
 ```bash
 source .venv/bin/activate
@@ -37,6 +37,11 @@ source .venv/bin/activate
 #### Windows PowerShell
 ```bash
 . .venv\Scripts\Activate.ps1
+```
+
+And finally install all pip dependencies:
+```bash
+pip install -r requirements.txt
 ```
 
 ### Running the application
