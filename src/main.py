@@ -15,7 +15,7 @@ class RequestBody(BaseModel):
 
 app = fastapi.FastAPI()
 
-def speakToFile(text: str, model: str, path: str):
+def speak_to_file(text: str, model: str, path: str):
     proc = subprocess.run(
         ["piper-tts", "-m", model, "-f", path, text],
         capture_output=True,
@@ -26,10 +26,10 @@ def speakToFile(text: str, model: str, path: str):
 
 @app.get("/api/models")
 async def getmodels():
-    modelDir = os.listdir(sys.argv[1])
+    model_dir = os.listdir(sys.argv[1])
     models = []
-    for entry in modelDir:
-        if entry.endswith(".onnx") and f"{entry}.json" in modelDir:
+    for entry in model_dir:
+        if entry.endswith(".onnx") and f"{entry}.json" in model_dir:
             models.append(entry.removesuffix(".onnx"))
 
     return models
@@ -44,7 +44,7 @@ async def speak(body: RequestBody):
             )
 
         try:
-            speakToFile(body.text, sys.argv[1] + os.path.sep + body.model, f.name)
+            speak_to_file(body.text, sys.argv[1] + os.path.sep + body.model, f.name)
         except subprocess.CalledProcessError:
             return JSONResponse(
                 {"detail": f"Could not find model '{body.model}'"},
