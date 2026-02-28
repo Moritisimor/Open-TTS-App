@@ -1,0 +1,41 @@
+FROM python:latest
+RUN mkdir PiperModels
+RUN pip install piper-tts pathvalidate
+
+# Install git and clone project repository
+RUN apt install git wget
+RUN git clone https://github.com/Moritisimor/Open-TTS-App.git
+
+# Install project pip requirements
+RUN pip install -r Open-TTS-App/src/requirements.txt
+
+# Move static web pages to working directory
+RUN mv Open-TTS-App/src/static ./static
+
+# Make piper-tts wrapper script, make it executable and move it to $PATH
+RUN touch piper-tts
+RUN echo "#!/usr/bin/sh \npiper -m \$2 -f \$4 \$5" > piper-tts
+RUN chmod +x piper-tts
+RUN mv piper-tts /usr/bin/piper-tts
+
+# Download piper models
+## English
+RUN wget https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/en/en_US/danny/low/en_US-danny-low.onnx?download=true -O en-us-danny.onnx
+RUN wget https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/en/en_US/danny/low/en_US-danny-low.onnx.json?download=true -O en-us-danny.onnx.json
+
+RUN wget https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/en/en_US/amy/low/en_US-amy-low.onnx?download=true -O en-us-amy.onnx
+RUN wget https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/en/en_US/amy/low/en_US-amy-low.onnx.json?download=true -O en-us-amy.onnx.json
+
+## Spanish
+RUN wget https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/es/es_ES/davefx/medium/es_ES-davefx-medium.onnx?download=true -O es-es-dave.onnx
+RUN wget https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/es/es_ES/davefx/medium/es_ES-davefx-medium.onnx.json?download=true -O es-es-dave.onnx.json
+
+## German
+RUN wget https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/de/de_DE/thorsten/low/de_DE-thorsten-low.onnx?download=true -O de-de-thorsten.onnx
+RUN wget https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/de/de_DE/thorsten/low/de_DE-thorsten-low.onnx.json?download=true -O de-de-thorsten.onnx.json
+
+RUN wget https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/de/de_DE/ramona/low/de_DE-ramona-low.onnx?download=true -O de-de-ramona.onnx
+RUN wget https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/de/de_DE/ramona/low/de_DE-ramona-low.onnx.json?download=true -O de-de-ramona.onnx.json
+
+CMD ["python", "Open-TTS-App/src/main.py", "."]
+EXPOSE 8000
