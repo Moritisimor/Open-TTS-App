@@ -1,5 +1,4 @@
 FROM python:latest
-RUN mkdir PiperModels
 RUN pip install piper-tts pathvalidate
 
 # Install git and clone project repository
