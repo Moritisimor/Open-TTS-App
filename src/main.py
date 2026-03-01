@@ -36,13 +36,13 @@ async def getmodels():
 
 @app.post("/api/speak")
 async def speak(body: RequestBody):
+    if body.text.strip() == "":
+        return JSONResponse(
+            {"detail": "Spoken text may not be empty."},
+            400
+        )
+        
     with tempfile.NamedTemporaryFile(mode="w+b", delete=True, suffix=".wav") as f:
-        if body.text.strip() == "":
-            return JSONResponse(
-                {"detail": "Spoken text may not be empty."},
-                400
-            )
-
         try:
             speak_to_file(body.text, sys.argv[1] + os.path.sep + body.model, f.name)
         except subprocess.CalledProcessError:
