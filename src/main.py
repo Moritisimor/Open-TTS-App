@@ -24,6 +24,10 @@ def speak_to_file(text: str, model: str, path: str):
 
     proc.check_returncode()
 
+@app.get("/health")
+async def gethealth():
+    return {"status": "UP"}
+
 @app.get("/api/models")
 async def getmodels():
     model_dir = os.listdir(sys.argv[1])
@@ -41,7 +45,7 @@ async def speak(body: RequestBody):
             {"detail": "Spoken text may not be empty."},
             400
         )
-        
+
     with tempfile.NamedTemporaryFile(mode="w+b", delete=True, suffix=".wav") as f:
         try:
             speak_to_file(body.text, sys.argv[1] + os.path.sep + body.model, f.name)
