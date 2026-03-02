@@ -11,7 +11,21 @@ You will need...
 - One or more Piper Models installed on your system
 
 ## How do I use it?
-### Cloning and environment-setup
+### The Docker-Way
+To run this application with Docker, you will simply need to pull the image:
+```bash
+docker pull moritisimor/open-tts-app:latest
+```
+
+And then run it:
+```bash
+docker run -p 8080:8000  moritisimor/open-tts-app:latest
+```
+
+Now visit ```http://localhost:8080``` in your browser!
+
+### The regular way
+#### Cloning and environment-setup
 First, you will need to clone this repository:
 ```bash
 git clone https://github.com/Moritisimor/Open-TTS-App
@@ -28,13 +42,13 @@ python -m venv .venv
 ```
 
 Then, update your environment variables:
-#### Linux/macOS/BSD
+##### Linux/macOS/BSD
 ```bash
 source .venv/bin/activate
 ```
 (If you use fish or csh, use activate.fish or activate.csh respectively)
 
-#### Windows PowerShell
+##### Windows PowerShell
 ```bash
 . .venv\Scripts\Activate.ps1
 ```
@@ -44,7 +58,7 @@ And finally install all pip dependencies:
 pip install -r requirements.txt
 ```
 
-### Running the application
+#### Running the application
 ```bash
 python main.py <Directory>
 ```
