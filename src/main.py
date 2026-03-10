@@ -9,11 +9,14 @@ import sys
 import tempfile
 import subprocess
 
+
 class RequestBody(BaseModel):
     text: str
     model: str
 
+
 app = fastapi.FastAPI()
+
 
 def speak_to_file(text: str, model: str, path: str):
     proc = subprocess.run(
@@ -24,9 +27,11 @@ def speak_to_file(text: str, model: str, path: str):
 
     proc.check_returncode()
 
+
 @app.get("/health")
 async def gethealth():
     return {"status": "UP"}
+
 
 @app.get("/api/models")
 async def getmodels():
@@ -37,6 +42,7 @@ async def getmodels():
             models.append(entry.removesuffix(".onnx"))
 
     return models
+
 
 @app.post("/api/speak")
 async def speak(body: RequestBody):
@@ -61,6 +67,7 @@ async def speak(body: RequestBody):
         buf = io.BytesIO(f.read())
         return StreamingResponse(buf)
 
+
 app.mount("/", staticfiles.StaticFiles(directory="./static", html=True))
 
 if __name__ == "__main__":
@@ -68,3 +75,4 @@ if __name__ == "__main__":
         uvicorn.run(app, host="0.0.0.0", port=8000)
     else:
         print("This application requires a path to the Piper Model Folder.")
+        exit(1)
