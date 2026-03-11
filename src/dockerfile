@@ -1,8 +1,11 @@
-FROM python:latest
+FROM python:slim
+RUN apt update
+RUN apt upgrade
+
 RUN pip install piper-tts pathvalidate
 
 # Install git and clone project repository
-RUN apt install git wget
+RUN apt install git wget -y
 RUN git clone https://github.com/Moritisimor/Open-TTS-App.git
 
 # Install project pip requirements
