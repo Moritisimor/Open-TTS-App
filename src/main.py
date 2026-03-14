@@ -1,13 +1,15 @@
 import fastapi
 from fastapi import staticfiles
 from fastapi.responses import JSONResponse, StreamingResponse
+
 from pydantic import BaseModel
 import uvicorn
+from piper import PiperVoice
+
+import wave
 import io
 import os
 import sys
-import tempfile
-import subprocess
 
 
 class RequestBody(BaseModel):
@@ -18,14 +20,31 @@ class RequestBody(BaseModel):
 app = fastapi.FastAPI()
 
 
-def speak_to_file(text: str, model: str, path: str):
-    proc = subprocess.run(
-        ["piper-tts", "-m", model, "-f", path, text],
-        capture_output=True,
-        text=True
-    )
+voices: dict[str, PiperVoice] = {}
 
-    proc.check_returncode()
+
+def load_voices(dir: str, storage: dict[str, PiperVoice]):
+    for entry in os.listdir(dir):
+        if entry.endswith(".onnx") and f"{entry}.json" in os.listdir(dir):
+            print(f"Loading model: {entry} into RAM...")
+            storage[entry.removesuffix(".onnx")] = PiperVoice.load(dir + os.path.sep + entry)
+
+
+def synthesize_to_stream(text: str, model: str):
+    voice = voices[model]
+    audio = voice.synthesize(text)
+
+    buffer = io.BytesIO()
+    with wave.open(buffer, "wb") as f:
+        f.setnchannels(1)
+        f.setsampwidth(2)
+        f.setframerate(voice.config.sample_rate)
+
+        for chunk in audio:
+            f.writeframes(chunk.audio_int16_bytes)
+
+    buffer.seek(0)
+    return buffer
 
 
 @app.get("/health")
@@ -35,13 +54,11 @@ async def gethealth():
 
 @app.get("/api/models")
 async def getmodels():
-    model_dir = os.listdir(sys.argv[1])
-    models = []
-    for entry in model_dir:
-        if entry.endswith(".onnx") and f"{entry}.json" in model_dir:
-            models.append(entry.removesuffix(".onnx"))
+    voices_list = []
+    for key in voices.keys():
+        voices_list.append(key)
 
-    return models
+    return voices_list
 
 
 @app.post("/api/speak")
@@ -51,27 +68,22 @@ async def speak(body: RequestBody):
             {"detail": "Spoken text may not be empty."},
             400
         )
-
-    with tempfile.NamedTemporaryFile(mode="w+b", delete=True, suffix=".wav") as f:
-        try:
-            speak_to_file(body.text, sys.argv[1] + os.path.sep + body.model, f.name)
-        except subprocess.CalledProcessError:
-            return JSONResponse(
-                {"detail": f"Could not find model '{body.model}'"},
-                422
-            )
-
-        f.flush()
-        f.seek(0)
-
-        buf = io.BytesIO(f.read())
-        return StreamingResponse(buf)
-
+    try:
+        return StreamingResponse(
+            synthesize_to_stream(body.text, body.model),
+            media_type="audio/wav"
+        )
+    except KeyError:
+        return JSONResponse(
+            {"error": "The Model that you entered could not be found."},
+            404
+        )
 
 app.mount("/", staticfiles.StaticFiles(directory="./static", html=True))
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
+        load_voices(sys.argv[1], voices)
         uvicorn.run(app, host="0.0.0.0", port=8000)
     else:
         print("This application requires a path to the Piper Model Folder.")
