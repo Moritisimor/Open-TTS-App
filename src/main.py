@@ -23,11 +23,11 @@ app = fastapi.FastAPI()
 voices: dict[str, PiperVoice] = {}
 
 
-def load_voices(dir: str, storage: dict[str, PiperVoice]):
-    for entry in os.listdir(dir):
-        if entry.endswith(".onnx") and f"{entry}.json" in os.listdir(dir):
+def load_voices(voice_dir: str, storage: dict[str, PiperVoice]):
+    for entry in os.listdir(voice_dir):
+        if entry.endswith(".onnx") and f"{entry}.json" in os.listdir(voice_dir):
             print(f"Loading model: {entry} into RAM...")
-            storage[entry.removesuffix(".onnx")] = PiperVoice.load(dir + os.path.sep + entry)
+            storage[entry.removesuffix(".onnx")] = PiperVoice.load(voice_dir + os.path.sep + entry)
 
 
 def synthesize_to_stream(text: str, model: str):
